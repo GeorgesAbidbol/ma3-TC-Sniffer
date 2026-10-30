@@ -15,9 +15,9 @@ Plugin Lua grandMA3 : coupe (`Off`) tous les shows Timecode du pool sauf celui c
 |---|---|
 | `Plugin "TC Sniffer" "3"` | garde le Timecode 3, coupe les autres |
 | `Plugin "TC Sniffer" "MonShow"` | garde le Timecode nommé « MonShow » |
-| `Plugin "TC Sniffer"` | ouvre une liste pour choisir |
+| `Plugin "TC Sniffer"` | garde le Timecode sélectionné, coupe les autres |
 
-Une macro par show = un bouton par show.
+Le plus simple : une seule macro `Plugin "TC Sniffer"`. Sélectionne le Timecode voulu (clic dans le pool Timecode), puis lance la macro.
 
 ## Réglages
 

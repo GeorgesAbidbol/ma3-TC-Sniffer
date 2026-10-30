@@ -3,7 +3,7 @@
 -- Utilisation depuis une macro :
 --   Plugin "TC Sniffer" "3"        -> garde le Timecode 3, coupe les autres
 --   Plugin "TC Sniffer" "MonShow"  -> garde le Timecode nommé "MonShow"
---   Plugin "TC Sniffer"            -> ouvre une liste pour choisir
+--   Plugin "TC Sniffer"            -> garde le Timecode sélectionné, coupe les autres
 --
 -- Réglages :
 local START_SELECTED = true  -- lance aussi (Go) le show choisi
@@ -18,18 +18,15 @@ local function findTimecode(timecodes, arg)
   end
 end
 
-local function chooseTimecode(timecodes)
-  local items = {}
-  for i, tc in ipairs(timecodes) do
-    items[i] = string.format("%d  %s", tc.no, tc.name)
+local function selectedTimecode(timecodes)
+  if not SelectedTimecode then
+    ErrPrintf("TC Sniffer : SelectedTimecode() indisponible dans cette version.")
+    return
   end
-  local _, value = PopupInput({
-    title  = "TC Sniffer : show à garder",
-    caller = GetFocusDisplay(),
-    items  = items,
-  })
-  for i, label in ipairs(items) do
-    if label == value then return timecodes[i] end
+  local sel = SelectedTimecode()
+  if not sel then return end
+  for _, tc in ipairs(timecodes) do
+    if tc.no == sel.no then return tc end
   end
 end
 
@@ -48,8 +45,11 @@ local function Main(displayHandle, argument)
       return
     end
   else
-    keep = chooseTimecode(timecodes)
-    if not keep then return end
+    keep = selectedTimecode(timecodes)
+    if not keep then
+      ErrPrintf("TC Sniffer : aucun Timecode sélectionné.")
+      return
+    end
   end
 
   if CONFIRM and not Confirm("TC Sniffer",
@@ -59,7 +59,7 @@ local function Main(displayHandle, argument)
 
   local count = 0
   for _, tc in ipairs(timecodes) do
-    if tc ~= keep then
+    if tc.no ~= keep.no then
       Cmd(string.format("Off Timecode %d", tc.no))
       count = count + 1
     end
